@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Store Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .product {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .product img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .product h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .product p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .sort-filter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fake Store Products</h1>
+        <div class="sort-filter">
+            <select id="category">
+                <option value="">All Categories</option>
+                <option value="men's clothing">Men's Clothing</option>
+                <option value="jewelery">Jewelry</option>
+                <option value="electronics">Electronics</option>
+                <option value="women's clothing">Women's Clothing</option>
+            </select>
+            <select id="sort">
+                <option value="asc">Sort by Price (Low to High)</option>
+                <option value="desc">Sort by Price (High to Low)</option>
+            </select>
+        </div>
+         <!-- for rendring the products-->
+        <div id="products"></div>
+    </div>
+
+    <script>
+          // function for fetching and rendering products
+        async function fetchAndDisplayProducts() {
+            const response = await fetch('https://fakestoreapi.com/products');
+            const products = await response.json();
+            displayProducts(products);
+        }
+
+        function displayProducts(products) {
+            const productsContainer = document.getElementById('products');
+            productsContainer.innerHTML = '';
+
+            const categoryFilter = document.getElementById('category').value;
+            const sortedProducts = sortProducts(products, document.getElementById('sort').value);
+
+            sortedProducts.forEach(product => {
+                if (!categoryFilter || product.category === categoryFilter) {
+                    const productElement = document.createElement('div');
+                    productElement.classList.add('product');
+
+                    productElement.innerHTML = `
+                        <h2>${product.title}</h2>
+                        <img src="${product.image}" alt="${product.title}">
+                        <p>Price: $${product.price}</p>
+                        <p>Category: ${product.category}</p>
+                    `;
+
+                    productsContainer.appendChild(productElement);
+                }
+            });
+        }
+
+        function sortProducts(products, sortOrder) {
+            return products.slice().sort((a, b) => {
+                if (sortOrder === 'asc') {
+                    return a.price - b.price;
+                } else {
+                    return b.price - a.price;
+                }
+            });
+        }
+
+        document.getElementById('category').addEventListener('change', fetchAndDisplayProducts);
+        document.getElementById('sort').addEventListener('change', fetchAndDisplayProducts);
+
+        fetchAndDisplayProducts();
+    </script>
+</body>
+</html>
